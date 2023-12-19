@@ -1,23 +1,92 @@
 import React, { Component } from 'react';
-// import axios from 'axios';
-import SearchBar from './Searchbar/SearchBar';
-import ImageGallery from './ImageGallery/ImageGallery';
-import ImageGalleryItem from './ImageGalleryItem/ImageGalleryItem';
-import Modal from './Modal/Modal';
-import Loader from './Loader/Loader';
-import Button from './Button/Button';
+import { SearchBar } from './Searchbar/SearchBar';
+import { ImageGallery } from './ImageGallery/ImageGallery';
+import { Modal } from './Modal/Modal';
+import { Loader } from './Loader/Loader';
+import { Button } from './Button/Button';
+import fetchImage from './FetchApi/FetchApi';
 
-import { fetchImage } from './FetchApi/FetchApi';
+// axios.defaults.baseURL = 'https://pixabay.com/api/?';
+// const ImageGallery = ({ items }) => (
+//   <ul>
+//     {items.map(({ id, webformatURL, largeImageURL, title }) => (
+//       <li key={id}>
+//         <img src={webformatURL} alt={title} />
+//       </li>
+//     ))}
+//   </ul>
+// );
+// const BASE_URL = 'https://pixabay.com/api/?';
+
+// const API_KEY = '40344925-ced1c275c1243101e1d196b12';
+
 export class App extends Component {
   state = {
-    galleryImg: '',
+    inputData: '',
     items: [],
+    page: 1,
+    totalImages: null,
+    isShowMore: false,
+    isShowModal: false,
+    hits: null,
+    isLoading: false,
+    error: '',
+    modalImages: '',
   };
-  handleFormSubmit = galleryImg => {
-    this.setState({ galleryImg }, this.fetchImage);
+
+  handleFormSubmit = inputData => {
+    if (this.state.inputData !== inputData) {
+      this.setState(
+        { inputData, page: 1, items: [], totalImages: 0 },
+        this.getImages
+      );
+    }
+  };
+  componentDidMount() {
+    this.getImages();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { inputData, page } = this.state;
+    if (prevState.inputData !== inputData || prevState.page !== page) {
+      this.getImages();
+    }
+  }
+
+  getImages = async () => {
+    const { inputData, page } = this.setState;
+    if (!inputData) {
+      return;
+    }
+    try {
+      this.setState({ isLoading: true, error: '' });
+      const response = await fetchImage(inputData, page);
+      this.setState(prevState => ({
+        items: prevState.items.concat(response.hits),
+      }));
+    } catch (error) {
+      console.log(error);
+      this.setState({ error: error.message });
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  };
+
+  handleClick = () => {
+    this.setState(prev => ({ page: prev.page + 1 }), this.getImages);
+  };
+
+  handleImageClick = imageUrl => {
+    this.setState({ modalImage: imageUrl, isShowModal: true });
+  };
+  handleCloseModal = () => {
+    this.setState({ isShowModal: false, modalImage: '' });
   };
 
   render() {
+    const { isLoading, items, error, isShowModal, isShowMore, modalImage } =
+      this.state;
+
     return (
       <div
         style={{
@@ -30,44 +99,25 @@ export class App extends Component {
         }}
       >
         <SearchBar onSubmit={this.handleFormSubmit} />
-        <ImageGallery galleryImg={this.state.galleryImg} />
+        <ImageGallery
+          items={this.state.items}
+          onClick={this.handleImageClick}
+        />
+        {isLoading && <Loader />}
+        {error && <h1>{error}</h1>}
+        {items.length > 0 && !isLoading && (
+          <Button onClick={this.handleClick}>
+            {isShowMore ? 'Hide images' : 'Show more'}
+          </Button>
+        )}
+        {isShowModal && (
+          <Modal
+            isOpenModal={isShowModal}
+            item={modalImage}
+            onCloseModal={this.handleCloseModal}
+          />
+        )}
       </div>
     );
   }
 }
-
-// export class App extends Component {
-//   state = {
-//     galleryImg: null,
-//     // передати потім в компонент loader
-//     loading: false,
-
-//   };
-//   componentDidMount() {
-//     this.setState({ loading: true });
-//     fetch(
-//       'https://pixabay.com/api/?q=cat&page=1&key=40344925-ced1c275c1243101e1d196b12&image_type=photo&orientation=horizontal&per_page=12'
-//     )
-//       .then(res => res.json())
-//       .then(galleryImg => this.setState({ galleryImg }))
-//       .finally(() => this.setState({ loading: false }));
-//   }
-
-//   render() {
-//     return (
-//       <div
-//         style={{
-//           height: '100vh',
-//           display: 'flex',
-//           justifyContent: 'center',
-//           alignItems: 'center',
-//           fontSize: 40,
-//           color: '#010101',
-//         }}
-//       >
-//         {this.state.loading && <h1>Loading...</h1>}
-//         {this.state.galleryImg && <div>hvghjgk</div>}
-//       </div>
-//     );
-//   }
-// }

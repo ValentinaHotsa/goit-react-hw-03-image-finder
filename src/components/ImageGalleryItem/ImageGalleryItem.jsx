@@ -1,4 +1,11 @@
-const ImageGalleryItem = ({ item }) => {
-  return <li>{item}</li>;
+export const ImageGalleryItem = ({ hit, onClick }) => {
+  const click = () => {
+    onClick(hit.webformatURL);
+  };
+
+  return (
+    <li>
+      <img src={hit.webformatURL} alt="" onClick={click} />
+    </li>
+  );
 };
-export default ImageGalleryItem;
