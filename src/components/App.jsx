@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { SearchBar } from './Searchbar/SearchBar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-import { Modal } from './Modal/Modal';
+import Modal from './Modal/Modal';
 import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 import fetchImage from './FetchApi/FetchApi';
@@ -36,10 +36,7 @@ export class App extends Component {
 
   handleFormSubmit = inputData => {
     if (this.state.inputData !== inputData) {
-      this.setState(
-        { inputData, page: 1, items: [], totalImages: 0 },
-        this.getImages
-      );
+      this.setState({ inputData, page: 1, items: [], totalImages: 0 });
     }
   };
   componentDidMount() {
@@ -54,7 +51,7 @@ export class App extends Component {
   }
 
   getImages = async () => {
-    const { inputData, page } = this.setState;
+    const { inputData, page } = this.state;
     if (!inputData) {
       return;
     }
@@ -88,21 +85,9 @@ export class App extends Component {
       this.state;
 
     return (
-      <div
-        style={{
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: 40,
-          color: '#010101',
-        }}
-      >
+      <>
         <SearchBar onSubmit={this.handleFormSubmit} />
-        <ImageGallery
-          items={this.state.items}
-          onClick={this.handleImageClick}
-        />
+        <ImageGallery items={items} onImageClick={this.handleImageClick} />
         {isLoading && <Loader />}
         {error && <h1>{error}</h1>}
         {items.length > 0 && !isLoading && (
@@ -117,7 +102,7 @@ export class App extends Component {
             onCloseModal={this.handleCloseModal}
           />
         )}
-      </div>
+      </>
     );
   }
 }

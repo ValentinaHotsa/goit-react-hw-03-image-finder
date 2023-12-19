@@ -1,11 +1,17 @@
-export const ImageGalleryItem = ({ hit, onClick }) => {
+import css from './imageGalleryItem.module.css';
+export const ImageGalleryItem = ({ hit, onImageClick }) => {
   const click = () => {
-    onClick(hit.webformatURL);
+    onImageClick(hit.webformatURL);
   };
 
   return (
-    <li>
-      <img src={hit.webformatURL} alt="" onClick={click} />
+    <li className={css.galleryItem}>
+      <img
+        className={css.galleryItemImage}
+        src={hit.webformatURL}
+        alt={hit.title}
+        onClick={click}
+      />
     </li>
   );
 };

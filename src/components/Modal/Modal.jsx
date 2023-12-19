@@ -1,6 +1,7 @@
 import { Component } from 'react';
+import css from './modal.module.css';
 
-export class Modal extends Component {
+export default class Modal extends Component {
   handleEsc = e => {
     if (e.code === 'Escape') this.props.onCloseModal();
   };
@@ -19,8 +20,8 @@ export class Modal extends Component {
   render() {
     const { item, onCloseModal } = this.props;
     return (
-      <div className="overlay" onClick={onCloseModal}>
-        <div>
+      <div className={css.overlay} onClick={onCloseModal}>
+        <div className={css.modal}>
           <img src={item} alt="" onClick={this.handleImageClick} />
         </div>
       </div>

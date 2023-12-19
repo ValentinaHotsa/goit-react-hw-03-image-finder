@@ -1,11 +1,16 @@
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { nanoid } from 'nanoid';
+import css from './imageGallery.module.css';
 
-export const ImageGallery = ({ items, onClick }) => {
+export const ImageGallery = ({ items, onImageClick }) => {
   return (
-    <ul className="gallery">
+    <ul className={css.gallery}>
       {items.map(item => (
-        <ImageGalleryItem key={nanoid()} hit={item} onImageClick={onClick} />
+        <ImageGalleryItem
+          key={nanoid()}
+          hit={item}
+          onImageClick={onImageClick}
+        />
       ))}
     </ul>
   );
